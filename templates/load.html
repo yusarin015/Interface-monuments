@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
     <title>Carga monumentos</title>
-    <link rel="stylesheet" href="/static/style_load.css">
+    <link rel="stylesheet" href="../static/style_load.css">
 </head>
 <body>
     <div class="container">
@@ -38,25 +38,29 @@
             event.preventDefault();
 
             const formData = new FormData(this);
-            const sources = [];
-            if(formData.has('todas')) {
-                sources.push("all");
+            const selectedSources = [];
+
+            const isAllSelected = formData.has('todas');
+
+            if (isAllSelected) {
+                selectedSources.push("cat", "cv", "mur");
+            } else {
+                if (formData.has('cat')) {
+                    selectedSources.push("cat");
+                }
+                if (formData.has('cv')) {
+                    selectedSources.push("cv");
+                }
+                if (formData.has('mur')) {
+                    selectedSources.push("mur");
+                }
             }
-            if(formData.has('cat')) {
-                sources.push("cat");
-            }
-            if(formData.has('cv')) {
-                sources.push("cv");
-            }
-            if(formData.has('mur')) {
-                sources.push("mur");
-            }
-            const urls = {
-                "cat": "https://url_api/cat",
-                "cv": "https://url_api/cv",
-                "mur": "https://url_api/mur",
-            };
             
+            const options = selectedSources.reduce((acc, source) => {
+                acc[source] = source;
+                return acc;
+            }, {});
+            const url = "url_api";
             const resultContainer = document.querySelector('.result-container');
             resultContainer.innerHTML='';
 
@@ -65,23 +69,16 @@
                 resDiv.innerHTML = `<p>${message}</p><br>`;
                 resultContainer.appendChild(resDiv);
             };
-
-            if(sources.includes("all")){
-                for (const key in urls){
-                    const response = await fetch(urls[key], {method: 'POST'});
-                    const data = await response.json();
-                    printResponse(data.message);
-                }
-            }else{
-                for (const source of sources) {
-                    if (urls[source]) {
-                        const response = await fetch(urls[source], { method: 'POST' });
-                        const data = await response.json();
-                        printResponse(data.message);
-                    }
-                }
-            }
-           
+            const response = await fetch(url, {
+                method: 'POST',
+                headers:{
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(options)
+            });
+            const data = await response.json();
+            printResponse(data.message);
+                
         });
     </script>
 </body>
