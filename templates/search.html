@@ -13,19 +13,18 @@
                         <label for="locality">Localidad:</label>
                         <input type="text" id="locality" name="locality"><br>
 
-                        <label for="zip-code">Código postal:</label>
-                        <input type="text" id="zip-code" name="zip-code"><br>
+                        <label for="zip_code">Código postal:</label>
+                        <input type="text" id="zip_code" name="zip_code"><br>
 
                         <label for="province">Provincia:</label>
                         <input type="text" id="province" name="province"><br>
 
                         <select name="monument_type">
-                            <option value="Yacimiento_arqueológico">Yacimiento arqueológico</option>
+                            <option value="Yacimiento_Arqueologico">Yacimiento arqueológico</option>
                             <option value="Iglesia_Ermita">Iglesia-Ermita</option>
                             <option value="Monasterio_Convento">Monasterio-Convento</option>
                             <option value="Castillo_Fortaleza_Torre">Castillo-Fortaleza-Torre</option>
-                            <option value="Edificio_singular">Edificio singular</option>
-                            <option value="Puente">Puente</option>
+                            <option value="Edificio_Singular">Edificio singular</option>
                             <option value="Otros">Otros</option>
                         </select><br>
 
@@ -50,9 +49,9 @@
                 const queryParams = new URLSearchParams();
 
                 formData.forEach((value, key) => {
-                    queryParams.append(key, value);
+                    if(value !== '') queryParams.append(key, value);
                 });
-                const url = `http://api_url/monuments?${queryParams.toString()}`;
+                const url = `http://127.0.0.1:7999/monuments/?${queryParams.toString()}`;
 
                 const response = await fetch(url, {
                     method: 'GET',  
@@ -70,7 +69,6 @@
                                                 <th>Tipo</th>
                                                 <th>Dirección</th>
                                                 <th>Cod.postal</th>
-                                                <th>Provincia</th>
                                                 <th>Descripción</th>
                                             </tr>`;
                     result.results.forEach(element => {
@@ -79,7 +77,6 @@
                                                 <td>${element.tipo}</td>
                                                 <td>${element.direccion}</td>
                                                 <td>${element.codigo_postal}</td>
-                                                <td>${element.provincia}</td>
                                                 <td>${element.descripcion}</td>
                                             </tr>`;
                         resultContainer.appendChild(resdiv)
