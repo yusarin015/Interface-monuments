@@ -9,7 +9,7 @@
         <div class="container">
             <div class="search">
                 <div class="form">
-                    <form id="searchForm" method="post" action="/search/search/">
+                    <form id="searchForm" method="get">
                         <label for="locality">Localidad:</label>
                         <input type="text" id="locality" name="locality"><br>
 
@@ -47,9 +47,15 @@
                 event.preventDefault();
                 
                 const formData = new FormData(this);
-                const response = await fetch('/search/search', {
-                    method: 'POST',
-                    body: formData
+                const queryParams = new URLSearchParams();
+
+                formData.forEach((value, key) => {
+                    queryParams.append(key, value);
+                });
+                const url = `http://api_url/monuments?${queryParams.toString()}`;
+
+                const response = await fetch(url, {
+                    method: 'GET',  
                 });
 
                 const result = await response.json();
@@ -57,11 +63,29 @@
                 resultContainer.innerHTML = ''
 
                 if(result.results && result.results.length > 0){
+                    const resdiv = document.createElement('div');
+                    let table = `<table>
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>Tipo</th>
+                                                <th>Dirección</th>
+                                                <th>Cod.postal</th>
+                                                <th>Provincia</th>
+                                                <th>Descripción</th>
+                                            </tr>`;
                     result.results.forEach(element => {
-                        const resdiv = document.createElement('div');
-                        resdiv.innerHTML = `<h5>${element.nombre}: </h5><p>${element.descripcion}</p><br>`;
+                        table+= `<tr>
+                                                <td>${element.nombre}</td>
+                                                <td>${element.tipo}</td>
+                                                <td>${element.direccion}</td>
+                                                <td>${element.codigo_postal}</td>
+                                                <td>${element.provincia}</td>
+                                                <td>${element.descripcion}</td>
+                                            </tr>`;
                         resultContainer.appendChild(resdiv)
                     });
+                    table+='</table>';
+                    resultContainer.innerHTML = table;
                 } else {
                     resultContainer.innerHTML = '<p>No se encontraron resultados</p>';
                 }
