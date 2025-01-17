@@ -9,9 +9,7 @@
             <h1>Carga del almacén de datos</h1>
             <div class="form_container">
                 <h3>Selecciona fuente:</h3>
-                <form id="load_form" action="post">
-                    <label for="todas">Seleccionar todas</label>
-                    <input type="checkbox" id="all" name="todas" value="all">
+                <form id="load_form">
                     <label for="cat">Castilla y León</label>
                     <input type="checkbox" id="cat" name="cat" value="cat">
                     <label for="cv">Comunitat Valenciana</label>
@@ -21,7 +19,6 @@
                     <div class="buttons">
                         <button type="reset" class="cancel-btn">Cancelar</button>
                         <button type="submit" class="submit-btn">Cargar</button>
-                        <button type="submit" class="delete-btn">Borrar almacén de datos</button>
                     </div>
                 </form>
             </div>
@@ -36,31 +33,21 @@
     <script>
         document.getElementById('load_form').addEventListener('submit', async function(event){
             event.preventDefault();
+            const catValue = document.getElementById("cat").checked;
+            const cvValue = document.getElementById("cv").checked;
+            const murValue = document.getElementById("mur").checked;
+        
+            const selectedExtractors = [];
 
-            const formData = new FormData(this);
-            const selectedSources = [];
+            if(catValue) selectedExtractors.push('cat')
+            if(cvValue) selectedExtractors.push('cv')
+            if(murValue) selectedExtractors.push('mur')
 
-            const isAllSelected = formData.has('todas');
-
-            if (isAllSelected) {
-                selectedSources.push("cat", "cv", "mur");
-            } else {
-                if (formData.has('cat')) {
-                    selectedSources.push("cat");
-                }
-                if (formData.has('cv')) {
-                    selectedSources.push("cv");
-                }
-                if (formData.has('mur')) {
-                    selectedSources.push("mur");
-                }
+            const body = {
+                extractors: selectedExtractors
             }
-            
-            const options = selectedSources.reduce((acc, source) => {
-                acc[source] = source;
-                return acc;
-            }, {});
-            const url = "url_api";
+
+            const url = "http://127.0.0.1:7999/extractors/";
             const resultContainer = document.querySelector('.result-container');
             resultContainer.innerHTML='';
 
@@ -69,13 +56,17 @@
                 resDiv.innerHTML = `<p>${message}</p><br>`;
                 resultContainer.appendChild(resDiv);
             };
+
             const response = await fetch(url, {
                 method: 'POST',
-                headers:{
-                    'Content-Type': 'application/json',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(options)
+                body: JSON.stringify(body)
             });
+
+            console.log(selectedExtractors);
+
             const data = await response.json();
             printResponse(data.message);
                 
