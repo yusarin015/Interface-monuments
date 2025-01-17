@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
     <title>Carga monumentos</title>
-    
+    <link rel="stylesheet" href="../static/style_load.css">
 </head>
 <body>
     <div class="container">
@@ -10,14 +10,15 @@
             <div class="form_container">
                 <h3>Selecciona fuente:</h3>
                 <form id="load_form">
-                    <input type="checkbox" id="all" name="todas" value="Seleccionar todas">
-                    <input type="checkbox" id="castilla" name="castilla" value="Castilla y León">
-                    <input type="checkbox" id="valencia" name="valencia" value="Comunitat Valenciana">
-                    <input type="checkbox" id="eus" name="euskadi" value="Euskadi">
+                    <label for="cat">Castilla y León</label>
+                    <input type="checkbox" id="cat" name="cat" value="cat">
+                    <label for="cv">Comunitat Valenciana</label>
+                    <input type="checkbox" id="cv" name="cv" value="cv">
+                    <label for="mur">Euskadi</label>
+                    <input type="checkbox" id="mur" name="mur" value="mur">
                     <div class="buttons">
-                        <button type="submit" class="cancel-btn">Cancelar</button>
+                        <button type="reset" class="cancel-btn">Cancelar</button>
                         <button type="submit" class="submit-btn">Cargar</button>
-                        <button type="submit" class="delete-btn">Borrar almacén de datos</button>
                     </div>
                 </form>
             </div>
@@ -29,4 +30,46 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('load_form').addEventListener('submit', async function(event){
+            event.preventDefault();
+            const catValue = document.getElementById("cat").checked;
+            const cvValue = document.getElementById("cv").checked;
+            const murValue = document.getElementById("mur").checked;
+        
+            const selectedExtractors = [];
+
+            if(catValue) selectedExtractors.push('cat')
+            if(cvValue) selectedExtractors.push('cv')
+            if(murValue) selectedExtractors.push('mur')
+
+            const body = {
+                extractors: selectedExtractors
+            }
+
+            const url = "http://127.0.0.1:7999/extractors/";
+            const resultContainer = document.querySelector('.result-container');
+            resultContainer.innerHTML='';
+
+            const printResponse = (message) => {
+                const resDiv = document.createElement('div');
+                resDiv.innerHTML = `<p>${message}</p><br>`;
+                resultContainer.appendChild(resDiv);
+            };
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            });
+
+            console.log(selectedExtractors);
+
+            const data = await response.json();
+            printResponse(data.message);
+                
+        });
+    </script>
 </body>

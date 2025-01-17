@@ -2,30 +2,29 @@
 <html>
     <head>
         <title>Buscar monumentos</title>
-        <link rel="stylesheet" href="/static/style_search.css">
+        <link rel="stylesheet" href="../static/style_search.css">
     </head>
     <body>
         <h1>Buscador de monumentos de intéres cultural</h1>
         <div class="container">
             <div class="search">
                 <div class="form">
-                    <form id="searchForm" method="post" action="/search/search/">
+                    <form id="searchForm" method="get">
                         <label for="locality">Localidad:</label>
                         <input type="text" id="locality" name="locality"><br>
 
-                        <label for="zip-code">Código postal:</label>
-                        <input type="text" id="zip-code" name="zip-code"><br>
+                        <label for="zip_code">Código postal:</label>
+                        <input type="text" id="zip_code" name="zip_code"><br>
 
                         <label for="province">Provincia:</label>
                         <input type="text" id="province" name="province"><br>
 
                         <select name="monument_type">
-                            <option value="Yacimiento_arqueológico">Yacimiento arqueológico</option>
+                            <option value="Yacimiento_Arqueologico">Yacimiento arqueológico</option>
                             <option value="Iglesia_Ermita">Iglesia-Ermita</option>
                             <option value="Monasterio_Convento">Monasterio-Convento</option>
                             <option value="Castillo_Fortaleza_Torre">Castillo-Fortaleza-Torre</option>
-                            <option value="Edificio_singular">Edificio singular</option>
-                            <option value="Puente">Puente</option>
+                            <option value="Edificio_Singular">Edificio singular</option>
                             <option value="Otros">Otros</option>
                         </select><br>
 
@@ -47,9 +46,15 @@
                 event.preventDefault();
                 
                 const formData = new FormData(this);
-                const response = await fetch('/search/search', {
-                    method: 'POST',
-                    body: formData
+                const queryParams = new URLSearchParams();
+
+                formData.forEach((value, key) => {
+                    if(value !== '') queryParams.append(key, value);
+                });
+                const url = `http://127.0.0.1:7999/monuments/?${queryParams.toString()}`;
+
+                const response = await fetch(url, {
+                    method: 'GET',  
                 });
 
                 const result = await response.json();
@@ -57,11 +62,27 @@
                 resultContainer.innerHTML = ''
 
                 if(result.results && result.results.length > 0){
+                    const resdiv = document.createElement('div');
+                    let table = `<table>
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>Tipo</th>
+                                                <th>Dirección</th>
+                                                <th>Cod.postal</th>
+                                                <th>Descripción</th>
+                                            </tr>`;
                     result.results.forEach(element => {
-                        const resdiv = document.createElement('div');
-                        resdiv.innerHTML = `<h5>${element.nombre}: </h5><p>${element.descripcion}</p><br>`;
+                        table+= `<tr>
+                                                <td>${element.nombre}</td>
+                                                <td>${element.tipo}</td>
+                                                <td>${element.direccion}</td>
+                                                <td>${element.codigo_postal}</td>
+                                                <td>${element.descripcion}</td>
+                                            </tr>`;
                         resultContainer.appendChild(resdiv)
                     });
+                    table+='</table>';
+                    resultContainer.innerHTML = table;
                 } else {
                     resultContainer.innerHTML = '<p>No se encontraron resultados</p>';
                 }
