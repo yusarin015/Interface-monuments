@@ -3,6 +3,8 @@
     <head>
         <title>Buscar monumentos</title>
         <link rel="stylesheet" href="../static/style_search.css">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     </head>
     <body>
         <h1>Buscador de monumentos de intéres cultural</h1>
@@ -41,13 +43,19 @@
                 <div class="result"></div>
             </div>
         </div>
-        <script>           
+        <script>  
+            var map = L.map('map').setView([40.416775, -3.703790], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map); 
+
             document.getElementById('searchForm').addEventListener('submit', async function(event){
                 event.preventDefault();
                 
                 const formData = new FormData(this);
                 const queryParams = new URLSearchParams();
-
+                
                 formData.forEach((value, key) => {
                     if(value !== '') queryParams.append(key, value);
                 });
@@ -83,9 +91,18 @@
                     });
                     table+='</table>';
                     resultContainer.innerHTML = table;
+                    
+                    const map_cards = `
+                        <div class="map-cards">
+                            <strong>${element.nombre}</strong>
+                            <p>${element.descripcion}</p>
+                        </div>
+                    `;
+                    L.marker([element.latitud, element.longitud]).addTo(map).bindPopup(map_cards, {minWidth: 200}).openPopup();
                 } else {
                     resultContainer.innerHTML = '<p>No se encontraron resultados</p>';
                 }
+
 
             })
         </script>
