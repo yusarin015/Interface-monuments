@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<head>
+    <title>Carga monumentos</title>
+    <link rel="stylesheet" href="../static/load.css">
+</head>
+<body>
+    <div class="container">
+        <div class="load_container">
+            <h1>Carga del almacén de datos</h1>
+            <div class="form_container">
+                <h3>Selecciona fuente:</h3>
+                <form id="load_form">
+                    <div class="input-container">
+                        <input type="checkbox" id="cat" name="cat" value="cat">
+                        <label for="cat">Castilla y León</label>
+                    </div>
+
+                    <div class="input-container">
+                        <input type="checkbox" id="cv" name="cv" value="cv">
+                        <label for="cv">Comunitat Valenciana</label>
+                    </div>
+
+                    <div class="input-container">
+                        <input type="checkbox" id="mur" name="mur" value="mur">
+                        <label for="mur">Euskadi</label>
+                    </div>
+
+                    <div class="buttons">
+                        <button type="reset" class="cancel-btn">Limpiar</button>
+                        <button type="submit" class="submit-btn">Cargar</button>
+                    </div>
+
+                    <button class="delete-btn">Borrar almacén de datos</button>
+                </form>
+            </div>
+            <div class="results">
+                <h3>Resultados de Carga</h3>
+                <div class="result-container">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    document.getElementById('load_form').addEventListener('submit', async function(event){
+        event.preventDefault();
+        const catValue = document.getElementById("cat").checked;
+        const cvValue = document.getElementById("cv").checked;
+        const murValue = document.getElementById("mur").checked;
+    
+        const selectedExtractors = [];
+
+        if(catValue) selectedExtractors.push('cat')
+        if(cvValue) selectedExtractors.push('cv')
+        if(murValue) selectedExtractors.push('mur')
+
+        // Petición a API
+        const url = "http://127.0.0.1:7999/extractors/";
+
+        const body = {
+            extractors: selectedExtractors
+        }
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+
+        const data = await response.json();
+
+        const resultContainer = document.querySelector('.result-container');
+        resultContainer.innerHTML='';
+
+        // Imprimir resultados
+        const printResponse = (message) => {
+            const resDiv = document.createElement('div');
+            resDiv.innerHTML = `<p>${message}</p><br>`;
+            resultContainer.appendChild(resDiv);
+        };
+
+        printResponse(data.message);
+
+        // Borrar almacén de datos
+        const deleteButton = document.getElementsByClassName('delete-btn')[0];
+        deleteButton.addEventListener('click', async function(event){
+            event.preventDefault();
+            const url = "http:/localhost:7999/monuments/";
+
+            const response = await fetch(url, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            printResponse(data.message);
+        });
+    });
+</script>
