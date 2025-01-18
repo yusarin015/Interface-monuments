@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Buscar monumentos</title>
-        <link rel="stylesheet" href="../static/style_search.css">
+        <link rel="stylesheet" href="../static/search.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     </head>
@@ -11,7 +11,7 @@
         <div class="container">
             <div class="search">
                 <div class="form">
-                    <form id="searchForm" method="get">
+                    <form id="search-form" method="get">
                         <label for="locality">Localidad:</label>
                         <input type="text" id="locality" name="locality"><br>
 
@@ -21,11 +21,13 @@
                         <label for="province">Provincia:</label>
                         <input type="text" id="province" name="province"><br>
 
-                        <select name="monument_type">
-                            <option value="Yacimiento_Arqueologico">Yacimiento arqueológico</option>
-                            <option value="Iglesia_Ermita">Iglesia-Ermita</option>
-                            <option value="Monasterio_Convento">Monasterio-Convento</option>
-                            <option value="Castillo_Fortaleza_Torre">Castillo-Fortaleza-Torre</option>
+                        <label for="monument_type">Tipo:</label>
+                        <select name="monument_type" id="monument_type">
+                            <option value="all">Selecciona un tipo</option>
+                            <option value="Yacimiento_Arqueologico">Yacimiento Arqueológico</option>
+                            <option value="Iglesia_Ermita">Iglesia/Ermita</option>
+                            <option value="Monasterio_Convento">Monasterio/Convento</option>
+                            <option value="Castillo_Fortaleza_Torre">Castillo/Fortaleza/Torre</option>
                             <option value="Edificio_Singular">Edificio singular</option>
                             <option value="Otros">Otros</option>
                         </select><br>
@@ -50,7 +52,7 @@
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map); 
 
-            document.getElementById('searchForm').addEventListener('submit', async function(event){
+            document.getElementById('search-form').addEventListener('submit', async function(event){
                 event.preventDefault();
                 
                 const formData = new FormData(this);
@@ -72,21 +74,21 @@
                 if(result.results && result.results.length > 0){
                     const resdiv = document.createElement('div');
                     let table = `<table>
-                                            <tr>
-                                                <th>Nombre</th>
-                                                <th>Tipo</th>
-                                                <th>Dirección</th>
-                                                <th>Cod.postal</th>
-                                                <th>Descripción</th>
-                                            </tr>`;
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Dirección</th>
+                            <th>Cod.postal</th>
+                            <th>Descripción</th>
+                        </tr>`;
                     result.results.forEach(element => {
-                        table+= `<tr>
-                                                <td>${element.nombre}</td>
-                                                <td>${element.tipo}</td>
-                                                <td>${element.direccion}</td>
-                                                <td>${element.codigo_postal}</td>
-                                                <td>${element.descripcion}</td>
-                                            </tr>`;
+                        table += `<tr>
+                                    <td>${element.nombre}</td>
+                                    <td>${element.tipo}</td>
+                                    <td>${element.direccion}</td>
+                                    <td>${element.codigo_postal}</td>
+                                    <td>${element.descripcion}</td>
+                                </tr>`;
                         resultContainer.appendChild(resdiv)
                     });
                     table+='</table>';
