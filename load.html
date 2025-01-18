@@ -82,5 +82,20 @@
         };
 
         printResponse(data.message);
+
+        // Borrar almacén de datos
+        const deleteButton = document.getElementsByClassName('delete-btn')[0];
+        deleteButton.addEventListener('click', async function(event){
+            event.preventDefault();
+            const url = "http:/localhost:7999/monuments/";
+
+            const response = await fetch(url, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            printResponse(data.message);
+        });
     });
 </script>
