@@ -34,14 +34,19 @@ body {
     color: #333;
 }
 
+.input-container {
+    display: flex;
+    margin-bottom: 10px;
+}
+
 input[type="checkbox"] {
     margin-right: 10px;
 }
 
 .buttons {
     display: flex;
-    justify-content: space-between;
     margin-top: 20px;
+    gap: 20px;
 }
 
 button {
@@ -65,6 +70,7 @@ button {
 .delete-btn {
     background-color: #e91e63;
     color: white;
+    margin-top: 20px;
 }
 
 .results {
