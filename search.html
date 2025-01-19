@@ -11,7 +11,7 @@
         <div class="container">
             <div class="search">
                 <div class="form">
-                    <form id="search-form" method="get">
+                    <form id="search-form">
                         <label for="locality">Localidad:</label>
                         <input type="text" id="locality" name="locality"><br>
 
@@ -23,7 +23,7 @@
 
                         <label for="monument_type">Tipo:</label>
                         <select name="monument_type" id="monument_type">
-                            <option value="all">Selecciona un tipo</option>
+                            <option value="">Selecciona un tipo</option>
                             <option value="Yacimiento_Arqueologico">Yacimiento Arqueológico</option>
                             <option value="Iglesia_Ermita">Iglesia/Ermita</option>
                             <option value="Monasterio_Convento">Monasterio/Convento</option>
@@ -50,7 +50,36 @@
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
                 maxZoom: 19,
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map); 
+            }).addTo(map);
+
+            const url = `http://127.0.0.1:7999/monuments/`;
+
+            const loadMap = async () => {
+                const response = await fetch(url, {
+                    method: 'GET',  
+                });
+
+                const result = await response.json();
+
+                if(result.results && result.results.length > 0) {
+                    result.results.forEach(element => {
+                        const map_cards = `
+                            <div class="map-cards">
+                                <strong>${element.nombre}</strong>
+                                <p>${element.descripcion}</p>
+                            </div>
+                        `;
+                    marker = L.marker([element.latitud, element.longitud]);
+                    marker.addTo(map)
+                    marker.bindPopup(`<div class="map-cards">
+                                        <strong>${element.nombre}</strong>
+                                        <p>${element.descripcion}</p>
+                                    </div>`);
+                    })
+                }
+            }
+
+            loadMap();
 
             document.getElementById('search-form').addEventListener('submit', async function(event){
                 event.preventDefault();
@@ -61,6 +90,7 @@
                 formData.forEach((value, key) => {
                     if(value !== '') queryParams.append(key, value);
                 });
+
                 const url = `http://127.0.0.1:7999/monuments/?${queryParams.toString()}`;
 
                 const response = await fetch(url, {
@@ -83,24 +113,16 @@
                         </tr>`;
                     result.results.forEach(element => {
                         table += `<tr>
-                                    <td>${element.nombre}</td>
-                                    <td>${element.tipo}</td>
-                                    <td>${element.direccion}</td>
-                                    <td>${element.codigo_postal}</td>
-                                    <td>${element.descripcion}</td>
-                                </tr>`;
+                            <td>${element.nombre}</td>
+                            <td>${element.tipo}</td>
+                            <td>${element.direccion}</td>
+                            <td>${element.codigo_postal}</td>
+                            <td>${element.descripcion}</td>
+                        </tr>`;
                         resultContainer.appendChild(resdiv)
                     });
                     table+='</table>';
                     resultContainer.innerHTML = table;
-                    
-                    const map_cards = `
-                        <div class="map-cards">
-                            <strong>${element.nombre}</strong>
-                            <p>${element.descripcion}</p>
-                        </div>
-                    `;
-                    L.marker([element.latitud, element.longitud]).addTo(map).bindPopup(map_cards, {minWidth: 200}).openPopup();
                 } else {
                     resultContainer.innerHTML = '<p>No se encontraron resultados</p>';
                 }
