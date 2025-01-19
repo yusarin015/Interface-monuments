@@ -63,6 +63,15 @@
         if(cvValue) selectedExtractors.push('cv')
         if(murValue) selectedExtractors.push('mur')
 
+        if(selectedExtractors.length === 0) {
+            printResponse("Seleccione una o más comunidades autónomas")
+            return
+        }
+
+        resultContainer.innerHTML = '';
+
+        printResponse("Procesando...");
+
         // Petición a API
         const url = "http://127.0.0.1:7999/extractors/";
 
@@ -79,9 +88,24 @@
 
         const data = await response.json();
 
-        // Imprimir resultados
         resultContainer.innerHTML = '';
-        printResponse(data.message);
+
+        if(data.error) {
+            printResponse(data.error);
+            return;
+        }
+
+        const keys = Object.keys(data);
+        keys?.forEach(key => {
+            printResponse(`--> Datos procesados de '${key}':`)
+            if(data[key].error) {
+                printResponse(data[key].error)
+                return;
+            }
+            data[key]?.forEach(message => {
+                printResponse(message)
+            })
+        })
     });
 
     // Borrar almacén de datos
