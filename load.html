@@ -62,13 +62,13 @@
         if(catValue) selectedExtractors.push('cat')
         if(cvValue) selectedExtractors.push('cv')
         if(murValue) selectedExtractors.push('mur')
+        
+        resultContainer.innerHTML = '';
 
         if(selectedExtractors.length === 0) {
             printResponse("Seleccione una o más comunidades autónomas")
             return
         }
-
-        resultContainer.innerHTML = '';
 
         printResponse("Procesando...");
 
