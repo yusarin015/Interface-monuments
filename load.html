@@ -29,9 +29,8 @@
                         <button type="reset" class="cancel-btn">Limpiar</button>
                         <button type="submit" class="submit-btn">Cargar</button>
                     </div>
-
-                    <button class="delete-btn">Borrar almacén de datos</button>
                 </form>
+                <button class="delete-btn">Borrar almacén de datos</button>
             </div>
             <div class="results">
                 <h3>Resultados de Carga</h3>
@@ -43,6 +42,15 @@
 </body>
 
 <script>
+    const resultContainer = document.querySelector('.result-container');
+    resultContainer.innerHTML='';
+
+    const printResponse = (message) => {
+        const resDiv = document.createElement('div');
+        resDiv.innerHTML = `<p>${message}</p><br>`;
+        resultContainer.appendChild(resDiv);
+    };
+
     document.getElementById('load_form').addEventListener('submit', async function(event){
         event.preventDefault();
         const catValue = document.getElementById("cat").checked;
@@ -71,31 +79,25 @@
 
         const data = await response.json();
 
-        const resultContainer = document.querySelector('.result-container');
-        resultContainer.innerHTML='';
+        // Imprimir resultados
+        resultContainer.innerHTML = '';
+        printResponse(data.message);
+    });
+
+    // Borrar almacén de datos
+    const deleteButton = document.getElementsByClassName('delete-btn')[0];
+    deleteButton.addEventListener('click', async function(event){
+        event.preventDefault();
+        const url = "http://127.0.0.1:7999/monuments/";
+
+        const response = await fetch(url, {
+            method: 'DELETE'
+        });
+
+        const data = await response.json();
 
         // Imprimir resultados
-        const printResponse = (message) => {
-            const resDiv = document.createElement('div');
-            resDiv.innerHTML = `<p>${message}</p><br>`;
-            resultContainer.appendChild(resDiv);
-        };
-
+        resultContainer.innerHTML = '';
         printResponse(data.message);
-
-        // Borrar almacén de datos
-        const deleteButton = document.getElementsByClassName('delete-btn')[0];
-        deleteButton.addEventListener('click', async function(event){
-            event.preventDefault();
-            const url = "http:/localhost:7999/monuments/";
-
-            const response = await fetch(url, {
-                method: 'DELETE'
-            });
-
-            const data = await response.json();
-
-            printResponse(data.message);
-        });
     });
 </script>
